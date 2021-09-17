@@ -32,8 +32,8 @@ with open(report_file_name, 'r') as fp:
                 'ticker': row[2],
                 'quantity': Decimal(row[3]) if row[3] else '',
                 'price': Decimal(row[4]) if row[4] else '',
-                'fee': Decimal(row[5]) if row[5] else 0,
-                'nkd': Decimal(row[6]) if row[6] else 0,
+                'fee': Decimal(row[5]) if row[5] else '',
+                'nkd': Decimal(row[6]) if row[6] else '',
                 'nominal': Decimal(row[7]) if row[7] else '',
                 'currency': row[8],
                 'fee_currency': row[9],
@@ -94,7 +94,7 @@ with open(report_file_name, 'r') as fp:
                         del buffer[source['link']]
                     elif event['operation'] == 'STOCKBUY' or event['operation'] == 'STOCKSELL':
                         dest['Event'] = event_mapping[event['operation']]
-                        dest['Symbol'] = event['ticker']
+                        dest['Symbol'] = event['ticker'] if not '.DE' in event['ticker'] else event['ticker'][0:-3]
                         dest['Price'] = event['price']
                         dest['Quantity'] = event['quantity']
                         dest['Currency'] = money['currency']
