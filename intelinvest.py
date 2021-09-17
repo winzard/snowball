@@ -28,17 +28,17 @@ with open(report_file_name, 'r') as fp:
         for row in csv_iter:
             source = {
                 'operation': row[0],
-                'at': datetime.datetime.strptime(row[1], '%d.%m.%Y %h:%M:%s'),
+                'at': datetime.datetime.strptime(row[1], '%d.%m.%Y %H:%M:%S'),
                 'ticker': row[2],
-                'quantity': Decimal(row[3]),
-                'price': Decimal(row[4]),
-                'fee': Decimal(row[4]),
-                'nkd': Decimal(row[5]),
-                'nominal': Decimal(row[6]),
-                'currency': row[7],
-                'fee_currency': Decimal(row[8]),
-                'note': row[9],
-                'link': row[10]
+                'quantity': Decimal(row[3]) if row[3] else '',
+                'price': Decimal(row[4]) if row[4] else '',
+                'fee': Decimal(row[5]) if row[5] else 0,
+                'nkd': Decimal(row[6]) if row[6] else 0,
+                'nominal': Decimal(row[7]) if row[7] else '',
+                'currency': row[8],
+                'fee_currency': row[9],
+                'note': row[10],
+                'link': row[11]
             }
             dest = {
                 'Event': '',
@@ -77,7 +77,7 @@ with open(report_file_name, 'r') as fp:
                         dest['NKD'] = 0
                         dest['FeeCurrency'] = event['fee_currency']
 
-                        print(",".join(list(dest.values())), file=output)
+                        print(",".join([str(f) for f in dest.values()]), file=output)
                         del buffer[source['link']]
                     elif event['operation'] == 'CURRENCY_SELL': # у меня пока нет таких операций
                         dest['Event'] = 'Cash_Convert'
@@ -90,7 +90,7 @@ with open(report_file_name, 'r') as fp:
                         dest['NKD'] = 0
                         dest['FeeCurrency'] = event['fee_currency']
 
-                        print(",".join(list(dest.values())), file=output)
+                        print(",".join([str(f) for f in dest.values()]), file=output)
                         del buffer[source['link']]
                     elif event['operation'] == 'STOCKBUY' or event['operation'] == 'STOCKSELL':
                         dest['Event'] = event_mapping[event['operation']]
@@ -102,7 +102,7 @@ with open(report_file_name, 'r') as fp:
                         dest['Exchange'] = 'MCX' if money['currency'] == 'RUB' else 'SPB'
                         dest['NKD'] = 0
                         dest['FeeCurrency'] = event['fee_currency']
-                        print(",".join(list(dest.values())), file=output)
+                        print(",".join([str(f) for f in dest.values()]), file=output)
                         del buffer[source['link']]
                     elif event['operation'] == 'BONDBUY' or event['operation'] == 'BONDSELL':
                         dest['Event'] = event_mapping[event['operation']]
@@ -114,7 +114,7 @@ with open(report_file_name, 'r') as fp:
                         dest['Exchange'] = 'MCX'
                         dest['NKD'] = event['nkd']
                         dest['FeeCurrency'] = money['currency']
-                        print(",".join(list(dest.values())), file=output)
+                        print(",".join([str(f) for f in dest.values()]), file=output)
                         del buffer[source['link']]
                     elif event['operation'] == 'LOSS' or event['operation'] == 'INCOME':
                         dest['Event'] = event_mapping[event['operation']]
@@ -126,7 +126,7 @@ with open(report_file_name, 'r') as fp:
                         dest['Exchange'] = ''
                         dest['NKD'] = ''
                         dest['FeeCurrency'] = ''
-                        print(",".join(list(dest.values())), file=output)
+                        print(",".join([str(f) for f in dest.values()]), file=output)
                         del buffer[source['link']]
 
             else:
@@ -137,33 +137,33 @@ with open(report_file_name, 'r') as fp:
                     dest['Symbol'] = event['currency']
                     dest['Price'] = 1
                     dest['Quantity'] = event['price']
-                    dest['Currency'] = money['currency']
+                    dest['Currency'] = event['currency']
                     dest['FeeTax'] = 0
                     dest['Exchange'] = 'MCX'
                     dest['NKD'] = 0
                     dest['FeeCurrency'] = ''
 
-                    print(",".join(list(dest.values())), file=output)
+                    print(",".join([str(f) for f in dest.values()]), file=output)
                 elif event['operation'] == 'MONEYWITHDRAW':
                     dest['Event'] = 'Cash_Out'
                     dest['Symbol'] = event['currency']
                     dest['Price'] = 1
                     dest['Quantity'] = event['price']
-                    dest['Currency'] = money['currency']
+                    dest['Currency'] = event['currency']
                     dest['FeeTax'] = 0
                     dest['Exchange'] = 'MCX'
                     dest['NKD'] = 0
                     dest['FeeCurrency'] = ''
 
-                    print(",".join(list(dest.values())), file=output)
+                    print(",".join([str(f) for f in dest.values()]), file=output)
                 elif event['operation'] == 'COUPON' or event['operation'] == 'DIVIDEND':
                     dest['Event'] = event_mapping[event['operation']]
                     dest['Symbol'] = event['ticker']
                     dest['Price'] = event['price']
-                    dest['Quantity'] = event['price']*event['quantity']/0.87 # intelinvest 13% вычитает
+                    dest['Quantity'] = event['price']*event['quantity']/Decimal(0.87) # intelinvest 13% вычитает
                     dest['Currency'] = event['currency']
-                    dest['FeeTax'] = dest['Quantity']*0.13
+                    dest['FeeTax'] = dest['Quantity']*Decimal(0.13)
                     dest['Exchange'] = 'MCX'
                     dest['NKD'] = 0
                     dest['FeeCurrency'] = ''
-                    print(",".join(list(dest.values())), file=output)
+                    print(",".join([str(f) for f in dest.values()]), file=output)
