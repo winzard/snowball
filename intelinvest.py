@@ -106,7 +106,7 @@ with open(report_file_name, 'r') as fp:
                         del buffer[source['link']]
                     elif event['operation'] == 'BONDBUY' or event['operation'] == 'BONDSELL':
                         dest['Event'] = event_mapping[event['operation']]
-                        dest['Symbol'] = event['ticker']
+                        dest['Symbol'] = event['ticker'] if not '.DE' in event['ticker'] else event['ticker'][0:-3]
                         dest['Price'] = event['price']
                         dest['Quantity'] = event['quantity']
                         dest['Currency'] = money['currency']
@@ -158,7 +158,7 @@ with open(report_file_name, 'r') as fp:
                     print(",".join([str(f) for f in dest.values()]), file=output)
                 elif event['operation'] == 'COUPON' or event['operation'] == 'DIVIDEND':
                     dest['Event'] = event_mapping[event['operation']]
-                    dest['Symbol'] = event['ticker']
+                    dest['Symbol'] = event['ticker'] if not '.DE' in event['ticker'] else event['ticker'][0:-3]
                     dest['Price'] = event['price']
                     dest['Quantity'] = event['price']*event['quantity']/Decimal(0.87) # intelinvest 13% вычитает
                     dest['Currency'] = event['currency']
