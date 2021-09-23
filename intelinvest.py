@@ -152,7 +152,7 @@ with open(report_file_name, 'r') as fp:
                     dest['Quantity'] = event['price']
                     dest['Currency'] = event['currency']
                     dest['FeeTax'] = 0
-                    dest['Exchange'] = 'MCX'
+                    dest['Exchange'] = ''
                     dest['NKD'] = 0
                     dest['FeeCurrency'] = ''
 
@@ -164,7 +164,7 @@ with open(report_file_name, 'r') as fp:
                     dest['Quantity'] = event['price']
                     dest['Currency'] = event['currency']
                     dest['FeeTax'] = 0
-                    dest['Exchange'] = 'MCX'
+                    dest['Exchange'] = ''
                     dest['NKD'] = 0
                     dest['FeeCurrency'] = ''
 
